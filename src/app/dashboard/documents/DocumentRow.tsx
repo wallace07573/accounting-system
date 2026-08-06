@@ -19,12 +19,12 @@ export default function DocumentRow({ doc, badgeClass }: { doc: any, badgeClass:
         cursor: 'pointer', 
         backgroundColor: doc.status === 'Verified' && (!doc.amount_paid || doc.amount_paid <= 0) 
             ? '#fee2e2' // Light red
-            : doc.group?.color 
-                ? doc.group.color 
-                : doc.status === 'Verified' 
-                    ? '#bbf7d0' 
-                    : doc.status === 'Payment Received' 
-                        ? '#f0fdf4' 
+            : doc.status === 'Verified' 
+                ? '#bbf7d0' // Green
+                : doc.status === 'Payment Received' 
+                    ? '#f0fdf4' // Lighter green
+                    : doc.group?.color 
+                        ? doc.group.color 
                         : 'transparent'
       }}
       className={styles.clickableRow}
