@@ -8,7 +8,7 @@ import Link from 'next/link'
 export default function ReportingClient({ groups }: { groups: any[] }) {
   const [selectedGroup, setSelectedGroup] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
-  const [reportData, setReportData] = useState({ verified: 0, paymentReceived: 0, draft: 0 })
+  const [reportData, setReportData] = useState<any>({ verified: 0, paymentReceived: 0, draft: 0, docsList: [] })
 
   useEffect(() => {
     if (!selectedGroup) return
