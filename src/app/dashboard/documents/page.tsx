@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, BarChart3 } from 'lucide-react'
 import styles from './Dashboard.module.css'
 import { redirect } from 'next/navigation'
 import DocumentListClient from './DocumentListClient'
@@ -61,10 +61,16 @@ export default async function DashboardPage() {
             {activeTenantName}
           </span>
         </div>
-        <Link href="/dashboard/documents/new" className={styles.newButton}>
-          <PlusCircle size={20} />
-          Create New
-        </Link>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Link href="/dashboard/documents/reporting" className={styles.newButton} style={{ backgroundColor: '#475569' }}>
+            <BarChart3 size={20} />
+            Check Reporting
+          </Link>
+          <Link href="/dashboard/documents/new" className={styles.newButton}>
+            <PlusCircle size={20} />
+            Create New
+          </Link>
+        </div>
       </div>
 
       <DocumentListClient documents={documents || []} />
