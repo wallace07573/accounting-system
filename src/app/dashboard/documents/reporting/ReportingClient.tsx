@@ -56,56 +56,108 @@ export default function ReportingClient({ groups }: { groups: any[] }) {
       </div>
 
       {selectedGroup ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-          {isLoading && (
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl">
-              <Loader2 className="animate-spin text-blue-500" size={32} />
-            </div>
-          )}
+        <div className="flex flex-col gap-6 relative">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-xl">
+                <Loader2 className="animate-spin text-blue-500" size={32} />
+              </div>
+            )}
 
-          {/* Verified Card */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Verified Amount</p>
-                <h3 className="text-2xl font-bold text-slate-900 mt-1">{formatCurrency(reportData.verified)}</h3>
+            {/* Verified Card */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Verified Amount</p>
+                  <h3 className="text-2xl font-bold text-slate-900 mt-1">{formatCurrency(reportData.verified)}</h3>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
+                  <CheckCircle2 size={24} />
+                </div>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg text-blue-600">
-                <CheckCircle2 size={24} />
-              </div>
+              <p className="text-sm text-slate-500">Total amount of verified invoices</p>
             </div>
-            <p className="text-sm text-slate-500">Total amount of verified invoices</p>
+
+            {/* Payment Received Card */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-green-500"></div>
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Payment Received</p>
+                  <h3 className="text-2xl font-bold text-slate-900 mt-1">{formatCurrency(reportData.paymentReceived)}</h3>
+                </div>
+                <div className="p-3 bg-green-50 rounded-lg text-green-600">
+                  <DollarSign size={24} />
+                </div>
+              </div>
+              <p className="text-sm text-slate-500">Total amount successfully collected</p>
+            </div>
+
+            {/* Draft Card */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-slate-400"></div>
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Draft Amount</p>
+                  <h3 className="text-2xl font-bold text-slate-900 mt-1">{formatCurrency(reportData.draft)}</h3>
+                </div>
+                <div className="p-3 bg-slate-100 rounded-lg text-slate-600">
+                  <FileEdit size={24} />
+                </div>
+              </div>
+              <p className="text-sm text-slate-500">Total amount of draft invoices</p>
+            </div>
           </div>
 
-          {/* Payment Received Card */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute top-0 left-0 w-full h-1 bg-green-500"></div>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Payment Received</p>
-                <h3 className="text-2xl font-bold text-slate-900 mt-1">{formatCurrency(reportData.paymentReceived)}</h3>
-              </div>
-              <div className="p-3 bg-green-50 rounded-lg text-green-600">
-                <DollarSign size={24} />
-              </div>
+          {/* Details Table */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-4">
+            <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
+              <h3 className="font-semibold text-slate-800">Document Breakdown</h3>
             </div>
-            <p className="text-sm text-slate-500">Total amount successfully collected</p>
-          </div>
-
-          {/* Draft Card */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute top-0 left-0 w-full h-1 bg-slate-400"></div>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Draft Amount</p>
-                <h3 className="text-2xl font-bold text-slate-900 mt-1">{formatCurrency(reportData.draft)}</h3>
-              </div>
-              <div className="p-3 bg-slate-100 rounded-lg text-slate-600">
-                <FileEdit size={24} />
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                  <tr className="bg-white border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-semibold">
+                    <th className="p-4 pl-6">Document No</th>
+                    <th className="p-4">Customer</th>
+                    <th className="p-4">Type</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4 text-right pr-6">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm">
+                  {reportData.docsList && reportData.docsList.length > 0 ? (
+                    reportData.docsList.map((doc: any) => (
+                      <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-4 pl-6 font-medium text-slate-900">{doc.doc_no}</td>
+                        <td className="p-4 text-slate-600">{doc.customer_name}</td>
+                        <td className="p-4 text-slate-600">{doc.type}</td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                            doc.status === 'Verified' ? 'bg-blue-100 text-blue-700' :
+                            doc.status === 'Payment Received' ? 'bg-green-100 text-green-700' :
+                            'bg-slate-100 text-slate-700'
+                          }`}>
+                            {doc.status}
+                          </span>
+                        </td>
+                        <td className="p-4 text-right pr-6 font-semibold text-slate-800">
+                          {formatCurrency(doc.amount)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-slate-500">
+                        {isLoading ? 'Loading documents...' : 'No documents found for this group.'}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-            <p className="text-sm text-slate-500">Total amount of draft invoices</p>
           </div>
         </div>
       ) : (
