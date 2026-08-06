@@ -1,0 +1,347 @@
+.documentContainer {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 10mm 20mm 20mm 20mm;
+  margin: 0 auto;
+  background: white;
+  color: #1e293b;
+  box-sizing: border-box;
+  font-size: 11pt;
+  display: flex;
+  flex-direction: column;
+}
+
+.topSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  margin-bottom: 0px;
+}
+
+.leftHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 60%;
+}
+
+.tenantBrandRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tenantLogoWrapper {
+  width: 80px; /* Adjusted based on screenshot, it's not too wide */
+  flex-shrink: 0;
+}
+
+.tenantLogo {
+  width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+.tenantName {
+  font-size: 26pt;
+  font-weight: 800;
+  margin: 0;
+  color: var(--brand-color, #0f172a);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.tenantContactBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tenantSsm {
+  font-size: 11pt;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.tenantAddress {
+  font-size: 10pt;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.divider {
+  border-top: 2px solid #000;
+  margin: 16px 0 24px 0;
+}
+
+.metaSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+.customerBlock {
+  flex: 1;
+}
+
+.customerLabel {
+  font-weight: 700;
+  font-size: 10pt;
+  color: #64748b;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.customerText {
+  margin: 0;
+  font-size: 10.5pt;
+  color: #1e293b;
+  line-height: 1.5;
+}
+
+.customerText strong {
+  color: #0f172a;
+}
+
+.rightHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  justify-content: space-between;
+}
+
+.docTitle {
+  font-size: 24pt;
+  font-weight: 800;
+  margin: 0;
+  color: #0f172a;
+  letter-spacing: 1px;
+}
+
+.docMetaGrid {
+  display: grid;
+  grid-template-columns: max-content max-content auto;
+  gap: 6px 12px;
+}
+
+.metaRow {
+  display: contents;
+}
+
+.metaRowLabel {
+  font-weight: 800;
+  color: #0f172a;
+  justify-self: start;
+}
+
+.metaRowColon {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.metaRowValue {
+  font-weight: normal;
+  color: #0f172a;
+  justify-self: start;
+  text-align: left;
+}
+
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.itemsTable th {
+  background-color: #f8fafc;
+  color: #475569;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 10pt;
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.itemsTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 11pt;
+  color: #334155;
+}
+
+.itemsTable tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+.colQty { width: 80px; text-align: center; }
+.colDesc { text-align: left; }
+.colPrice { width: 120px; text-align: right; }
+.colAmount { width: 120px; text-align: right; }
+
+.summaryContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -1px;
+}
+
+.summaryBlock {
+  width: 350px;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  background-color: white;
+  border-radius: 0 0 4px 4px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  font-size: 12pt;
+}
+
+.summaryRow.grandTotal {
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 14pt;
+  border-top: 1px solid #e2e8f0;
+}
+
+.bottomSection {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.bankBlock {
+  border: 1px solid #e2e8f0;
+  width: 350px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bankHeader {
+  background-color: #f8fafc;
+  color: #475569;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 10pt;
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bankDetails {
+  padding: 16px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.termsBlock {
+  margin-top: 40px;
+}
+
+.termsTitle {
+  font-weight: 600;
+  font-size: 10pt;
+  color: #64748b;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.termsText {
+  font-size: 10pt;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #475569;
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  margin-bottom: 40px;
+}
+
+.sigBox {
+  width: 40%;
+}
+
+.sigLine {
+  border-top: 1px solid #94a3b8;
+  padding-top: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 11pt;
+  margin-bottom: 5px;
+  color: #0f172a;
+}
+
+.sigSub {
+  text-align: center;
+  font-size: 9pt;
+  color: #64748b;
+  margin-bottom: 15px;
+}
+
+.sigField {
+  display: flex;
+  margin-bottom: 10px;
+  font-size: 10pt;
+  color: #334155;
+}
+
+.sigLabel {
+  width: 50px;
+}
+
+.sigInput {
+  flex: 1;
+  border-bottom: 1px dashed #cbd5e1;
+}
+
+.footer {
+  text-align: center;
+  padding-top: 30px;
+  font-size: 9pt;
+  color: #94a3b8;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 20px;
+}
+
+@page {
+  margin: 0;
+  size: A4;
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+  }
+  
+  .documentContainer {
+    width: 210mm;
+    min-height: 296.5mm;
+    height: 296.5mm; /* Slightly less than 297mm to prevent blank page overflow */
+    margin: 0;
+    padding: 10mm 20mm 20mm 20mm;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+}
