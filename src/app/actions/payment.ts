@@ -136,7 +136,7 @@ export async function searchInvoices(query: string) {
     .from('documents')
     .select('doc_no')
     .eq('tenant_id', tenantId)
-    .ilike('type', 'invoice')
+    .in('type', ['Invoice', 'Pre-Order'])
     .ilike('doc_no', `%${query}%`)
     .limit(10)
 

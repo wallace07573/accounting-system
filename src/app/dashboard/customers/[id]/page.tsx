@@ -70,7 +70,7 @@ export default async function CustomerPage({ params }: { params: { id: string } 
 
   if (documents) {
     documents.forEach(doc => {
-      if (doc.type === 'Invoice') {
+      if (doc.type === 'Invoice' || doc.type === 'Pre-Order') {
         const docTotal = doc.items.reduce((sum: number, item: any) => sum + Number(item.amount), 0)
         totalInvoiced += docTotal
         totalPaid += Number(doc.amount_paid || 0)
