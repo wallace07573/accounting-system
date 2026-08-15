@@ -46,11 +46,54 @@ export async function createPaymentRecord(data: {
 
   // Automatically mark the linked auction as Verified
   if (data.is_auction && data.auction_no) {
-    await supabase
+    const { data: auction } = await supabase
       .from('auction_records')
       .update({ status: 'Verified', amount_paid: data.amount })
       .eq('tenant_id', tenantId)
       .eq('auc_no', data.auction_no)
+      .select('id, name, phone_number, customer_id')
+      .single()
+
+    if (auction && !auction.customer_id && auction.name) {
+      let customerIdToLink = null;
+      
+      // Check if customer exists by phone_number
+      if (auction.phone_number) {
+        const { data: existingCustomer } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('tenant_id', tenantId)
+          .eq('contact_number', auction.phone_number)
+          .single();
+          
+        if (existingCustomer) customerIdToLink = existingCustomer.id;
+      }
+
+      // If no customer found, create a new one
+      if (!customerIdToLink) {
+        const { data: newCustomer } = await supabase
+          .from('customers')
+          .insert({
+            tenant_id: tenantId,
+            name: auction.name,
+            attention: auction.phone_number,
+            contact_number: auction.phone_number,
+            balance: 0
+          })
+          .select('id')
+          .single();
+          
+        if (newCustomer) customerIdToLink = newCustomer.id;
+      }
+
+      // Link back to the auction record
+      if (customerIdToLink) {
+        await supabase
+          .from('auction_records')
+          .update({ customer_id: customerIdToLink })
+          .eq('id', auction.id)
+      }
+    }
   }
 
   revalidatePath('/dashboard/payments')
@@ -193,11 +236,54 @@ export async function updatePaymentRecord(id: string, data: {
 
   // Mark new linked auction as Verified
   if (data.is_auction && data.auction_no) {
-    await supabase
+    const { data: auction } = await supabase
       .from('auction_records')
       .update({ status: 'Verified', amount_paid: data.amount })
       .eq('tenant_id', tenantId)
       .eq('auc_no', data.auction_no)
+      .select('id, name, phone_number, customer_id')
+      .single()
+
+    if (auction && !auction.customer_id && auction.name) {
+      let customerIdToLink = null;
+      
+      // Check if customer exists by phone_number
+      if (auction.phone_number) {
+        const { data: existingCustomer } = await supabase
+          .from('customers')
+          .select('id')
+          .eq('tenant_id', tenantId)
+          .eq('contact_number', auction.phone_number)
+          .single();
+          
+        if (existingCustomer) customerIdToLink = existingCustomer.id;
+      }
+
+      // If no customer found, create a new one
+      if (!customerIdToLink) {
+        const { data: newCustomer } = await supabase
+          .from('customers')
+          .insert({
+            tenant_id: tenantId,
+            name: auction.name,
+            attention: auction.phone_number,
+            contact_number: auction.phone_number,
+            balance: 0
+          })
+          .select('id')
+          .single();
+          
+        if (newCustomer) customerIdToLink = newCustomer.id;
+      }
+
+      // Link back to the auction record
+      if (customerIdToLink) {
+        await supabase
+          .from('auction_records')
+          .update({ customer_id: customerIdToLink })
+          .eq('id', auction.id)
+      }
+    }
   }
 
   revalidatePath('/dashboard/payments')
