@@ -28,6 +28,22 @@ export async function deleteCustomer(id: string) {
   if (linkedDocs && linkedDocs.length > 0) {
     return { error: 'Cannot delete customer. There are documents (invoices/quotations) associated with this customer.' }
   }
+
+  // Check if this customer has any associated auctions
+  const { data: linkedAuctions, error: aucCheckError } = await supabase
+    .from('auction_records')
+    .select('id')
+    .eq('customer_id', id)
+    .eq('tenant_id', tenantId)
+    .limit(1)
+
+  if (aucCheckError) {
+    return { error: 'Error validating customer auction records' }
+  }
+
+  if (linkedAuctions && linkedAuctions.length > 0) {
+    return { error: 'Cannot delete customer. There are auction records associated with this customer.' }
+  }
   
   // Safe to delete
   const { error } = await supabase
@@ -191,6 +207,14 @@ export async function mergeCustomer(sourceId: string, targetId: string) {
       .eq('customer_id', sourceId)
       .eq('tenant_id', tenantId)
     if (docError) throw new Error('Failed to move documents: ' + docError.message)
+
+    // 1.5 Move auctions
+    const { error: aucError } = await supabase
+      .from('auction_records')
+      .update({ customer_id: targetId })
+      .eq('customer_id', sourceId)
+      .eq('tenant_id', tenantId)
+    if (aucError) throw new Error('Failed to move auctions: ' + aucError.message)
 
     // 2. Move transactions
     const { error: txError } = await supabase

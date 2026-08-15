@@ -4,18 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 
-function normalizePhoneNumber(phone?: string) {
-  if (!phone) return phone;
-  let cleaned = phone.replace(/[^\d+]/g, '');
-  if (cleaned.startsWith('+60')) {
-    cleaned = '60' + cleaned.substring(3);
-  } else if (cleaned.startsWith('0')) {
-    cleaned = '60' + cleaned.substring(1);
-  } else if (cleaned.startsWith('60')) {
-    // already starts with 60
-  }
-  return cleaned;
-}
+import { formatPhoneNumber } from '@/utils/utils'
 
 export async function createAuctionRecord(data: {
   date: string;
@@ -43,7 +32,7 @@ export async function createAuctionRecord(data: {
   }
 
   // Normalize phone number
-  const normalizedPhone = normalizePhoneNumber(data.phone_number)
+  const normalizedPhone = formatPhoneNumber(data.phone_number)
   
   // Try to find a matching customer
   let customerId = null
@@ -148,7 +137,7 @@ export async function updateAuctionRecord(id: string, data: {
 
   const supabase = await createClient()
   
-  const normalizedPhone = normalizePhoneNumber(data.phone_number)
+  const normalizedPhone = formatPhoneNumber(data.phone_number)
   
   let customerId = null
   if (normalizedPhone) {
