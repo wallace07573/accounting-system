@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { ArrowLeft, Edit, Building2, User, Phone, MapPin, Receipt, Wallet, AlertCircle } from 'lucide-react'
+import { formatPhoneNumber } from '@/utils/utils'
 import CustomerDetailClient from './CustomerDetailClient'
 
 export default async function CustomerPage({ params }: { params: { id: string } }) {
@@ -116,7 +117,7 @@ export default async function CustomerPage({ params }: { params: { id: string } 
               <Phone size={18} color="#94a3b8" style={{ marginTop: '2px' }} />
               <div>
                 <div style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>Contact / Attention</div>
-                <div style={{ fontSize: '15px', color: '#1e293b' }}>{customer.attention || '-'}</div>
+                <div style={{ fontSize: '15px', color: '#1e293b' }}>{formatPhoneNumber(customer.attention)}</div>
               </div>
             </div>
             

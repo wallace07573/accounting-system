@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { formatPhoneNumber } from '@/utils/utils'
 
 export async function deleteCustomer(id: string) {
   const cookieStore = await cookies()
@@ -63,7 +64,7 @@ export async function updateCustomer(id: string, formData: any) {
         name: formData.name,
         company_name: formData.company_name || null,
         address: formData.address || null,
-        attention: formData.attention || null,
+        attention: formData.attention ? formatPhoneNumber(formData.attention) : null,
         email: formData.email || null,
         is_verified: formData.is_verified || false,
         bank_name: formData.bank_name || null,
@@ -102,7 +103,7 @@ export async function addCustomer(formData: any) {
       .insert({
         tenant_id: tenantId,
         name: formData.name,
-        attention: formData.attention || null,
+        attention: formData.attention ? formatPhoneNumber(formData.attention) : null,
         email: formData.email || null,
         balance: formData.balance || 0
       })

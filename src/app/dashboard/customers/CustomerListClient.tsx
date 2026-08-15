@@ -5,6 +5,7 @@ import { Search, Users, ChevronLeft, ChevronRight, Eye, Plus, X } from 'lucide-r
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { addCustomer } from '@/app/actions/customer'
+import { formatPhoneNumber } from '@/utils/utils'
 import styles from '../documents/Dashboard.module.css'
 
 export default function CustomerListClient({ customers }: { customers: any[] }) {
@@ -174,7 +175,7 @@ export default function CustomerListClient({ customers }: { customers: any[] }) 
                     <td style={{ fontWeight: 600, color: Number(c.balance) < 0 ? '#ef4444' : (Number(c.balance) > 0 ? '#10b981' : '#64748b') }}>
                       RM {Number(c.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
-                    <td>{c.attention || '-'}</td>
+                    <td>{formatPhoneNumber(c.attention)}</td>
                     <td style={{ color: '#64748b' }}>
                       {new Date(c.created_at).toLocaleDateString()}
                     </td>
