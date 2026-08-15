@@ -157,14 +157,14 @@ export default async function CustomerPage({ params }: { params: { id: string } 
             </div>
           </div>
           
-          <div style={{ backgroundColor: '#fef2f2', borderRadius: '12px', padding: '20px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <AlertCircle size={24} color="white" />
+          <div style={{ backgroundColor: '#f5f3ff', borderRadius: '12px', padding: '20px', border: '1px solid #ddd6fe', display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', backgroundColor: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Wallet size={24} color="white" />
             </div>
             <div>
-              <div style={{ fontSize: '14px', color: '#991b1b', fontWeight: 600 }}>Total Outstanding</div>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#7f1d1d', marginTop: '2px' }}>
-                RM {totalOutstanding.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <div style={{ fontSize: '14px', color: '#5b21b6', fontWeight: 600 }}>CRM Balance</div>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#4c1d95', marginTop: '2px' }}>
+                RM {Number(customer.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </div>
           </div>
