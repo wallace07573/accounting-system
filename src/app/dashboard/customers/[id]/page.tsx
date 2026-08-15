@@ -39,6 +39,22 @@ export default async function CustomerPage({ params }: { params: { id: string } 
     .eq('tenant_id', activeTenantId)
     .order('created_at', { ascending: false })
 
+  // Fetch Transactions
+  const { data: transactions } = await supabase
+    .from('customer_transactions')
+    .select('*')
+    .eq('customer_id', id)
+    .eq('tenant_id', activeTenantId)
+    .order('created_at', { ascending: false })
+
+  // Fetch other customers for Merge dropdown
+  const { data: otherCustomers } = await supabase
+    .from('customers')
+    .select('id, name')
+    .eq('tenant_id', activeTenantId)
+    .neq('id', id)
+    .order('name', { ascending: true })
+
   let totalInvoiced = 0
   let totalPaid = 0
   let totalOutstanding = 0
@@ -154,7 +170,7 @@ export default async function CustomerPage({ params }: { params: { id: string } 
         </div>
       </div>
 
-      <CustomerDetailClient customer={customer} documents={documents || []} />
+      <CustomerDetailClient customer={customer} documents={documents || []} transactions={transactions || []} otherCustomers={otherCustomers || []} />
     </div>
   )
 }
