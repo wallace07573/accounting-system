@@ -8,7 +8,7 @@ import styles from '../../documents/Dashboard.module.css'
 import { updateCustomer, deleteCustomer, addCustomerTransaction, mergeCustomer } from '@/app/actions/customer'
 import { useToast } from '@/components/Toast'
 
-export default function CustomerDetailClient({ customer, documents, transactions, otherCustomers }: { customer: any, documents: any[], transactions: any[], otherCustomers: any[] }) {
+export default function CustomerDetailClient({ customer, documents, transactions, otherCustomers, auctions = [] }: { customer: any, documents: any[], transactions: any[], otherCustomers: any[], auctions?: any[] }) {
   const [activeTab, setActiveTab] = useState<'history' | 'ledger' | 'edit'>('history')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -76,9 +76,11 @@ export default function CustomerDetailClient({ customer, documents, transactions
 
   const getBadgeClass = (type: string) => {
     switch(type) {
+      case 'Pre-Order': return styles.badgeInvoice;
       case 'Invoice': return styles.badgeInvoice;
       case 'Quotation': return styles.badgeQuotation;
       case 'Delivery Order': return styles.badgeDO;
+      case 'Auction': return styles.badgeQuotation; // Reusing Quotation badge styling for Auction
       default: return '';
     }
   }
@@ -173,65 +175,86 @@ export default function CustomerDetailClient({ customer, documents, transactions
         </button>
       </div>
 
-      {activeTab === 'history' && (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Doc No</th>
-              <th>Type</th>
-              <th>Date</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'center' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!documents || documents.length === 0 ? (
+      {activeTab === 'history' && (() => {
+        // Merge and sort documents & auctions
+        const allRecords = [
+          ...(documents || []).map(doc => ({
+            id: doc.id,
+            no: doc.doc_no,
+            type: doc.type,
+            date: doc.issue_date,
+            amount: doc.items?.reduce((sum: number, item: any) => sum + Number(item.amount), 0) || 0,
+            status: doc.status,
+            editLink: `/dashboard/documents/${doc.id}/edit`
+          })),
+          ...(auctions || []).map(auc => ({
+            id: auc.id,
+            no: auc.auc_no,
+            type: 'Auction',
+            date: auc.date,
+            amount: auc.amount,
+            status: auc.status,
+            editLink: '/dashboard/auctions'
+          }))
+        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+        return (
+          <table className={styles.table}>
+            <thead>
               <tr>
-                <td colSpan={6}>
-                  <div className={styles.emptyState}>
-                    <FileText size={48} color="#94a3b8" style={{ margin: '0 auto 16px' }} />
-                    <div className={styles.emptyTitle}>No documents found</div>
-                    <div>This customer does not have any documents yet.</div>
-                  </div>
-                </td>
+                <th>Record No</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
-            ) : (
-              documents.map((doc) => {
-                const totalAmount = doc.items.reduce((sum: number, item: any) => sum + Number(item.amount), 0)
-                
-                return (
-                  <tr key={doc.id}>
-                    <td style={{ fontWeight: 600, color: '#0f172a' }}>{doc.doc_no}</td>
+            </thead>
+            <tbody>
+              {allRecords.length === 0 ? (
+                <tr>
+                  <td colSpan={6}>
+                    <div className={styles.emptyState}>
+                      <FileText size={48} color="#94a3b8" style={{ margin: '0 auto 16px' }} />
+                      <div className={styles.emptyTitle}>No records found</div>
+                      <div>This customer does not have any documents or auctions yet.</div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                allRecords.map((record) => (
+                  <tr key={`${record.type}-${record.id}`}>
+                    <td style={{ fontWeight: 600, color: '#0f172a' }}>{record.no}</td>
                     <td>
-                      <span className={`${styles.badge} ${getBadgeClass(doc.type)}`}>
-                        {doc.type}
+                      <span className={`${styles.badge} ${getBadgeClass(record.type)}`}>
+                        {record.type}
                       </span>
                     </td>
-                    <td style={{ color: '#64748b' }}>{new Date(doc.issue_date).toLocaleDateString()}</td>
+                    <td style={{ color: '#64748b' }}>{new Date(record.date).toLocaleDateString()}</td>
                     <td style={{ fontWeight: 600, color: '#0f172a' }}>
-                      RM {totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      RM {Number(record.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td>
-                      <span className={styles.statusBadge} data-status={doc.status}>
-                        {doc.status}
+                      <span className={styles.statusBadge} data-status={record.status}>
+                        {record.status}
                       </span>
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       <Link 
-                        href={`/dashboard/documents/${doc.id}/edit`}
+                        href={record.editLink}
                         style={{ display: 'inline-flex', padding: '6px', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '6px', backgroundColor: 'white', textDecoration: 'none' }}
+                        title={record.type === 'Auction' ? 'Go to Auctions' : 'Edit Document'}
                       >
                         <Edit size={16} />
                       </Link>
                     </td>
                   </tr>
-                )
-              })
-            )}
-          </tbody>
-        </table>
-      )}
+                ))
+              )}
+            </tbody>
+          </table>
+        )
+      })()}
 
       {activeTab === 'ledger' && (
         <div style={{ padding: '0' }}>
