@@ -31,7 +31,7 @@ export interface DocumentItem {
 }
 
 export interface DocumentData {
-  type: 'Invoice' | 'Quotation' | 'Delivery Order';
+  type: 'Invoice' | 'Quotation' | 'Delivery Order' | 'Pre-Order';
   doc_no: string;
   issue_date: string;
   due_date?: string;
@@ -134,7 +134,7 @@ export const PremiumDocument: React.FC<PremiumDocumentProps> = ({ tenant, custom
               </div>
 
               <div className={styles.rightHeader}>
-                <h2 className={styles.docTitle}>{document.type.toUpperCase()}</h2>
+                <h2 className={styles.docTitle}>{document.type === 'Pre-Order' ? 'INVOICE' : document.type.toUpperCase()}</h2>
                 <div className={styles.docMetaGrid}>
                   <div className={styles.metaRow}>
                     <span className={styles.metaRowLabel}>{isDO ? 'DO' : isQuotation ? 'QUO' : 'INV'} NO.</span>
@@ -170,7 +170,7 @@ export const PremiumDocument: React.FC<PremiumDocumentProps> = ({ tenant, custom
                 <div className={styles.customerLabel}>
                   {isDO ? 'DELIVER TO:' : isQuotation ? 'QUOTATION TO:' : 'INVOICE TO:'}
                 </div>
-                {(isQuotation || document.type === 'Invoice') && document.is_corporate ? (
+                {(isQuotation || document.type === 'Invoice' || document.type === 'Pre-Order') && document.is_corporate ? (
                   <>
                     <p className={styles.customerText} style={{ fontWeight: 800, fontSize: '13pt', color: '#0f172a', marginBottom: '4px' }}>
                       {customer.company_name || customer.name}
@@ -260,7 +260,7 @@ export const PremiumDocument: React.FC<PremiumDocumentProps> = ({ tenant, custom
 
                 {/* Bottom Section */}
                 <div className={styles.bottomSection}>
-                  {(document.type === 'Invoice' || (document.type === 'Quotation' && document.show_bank_details)) && (tenant.bank_name || tenant.bank_account_number || tenant.bank_account_name) && (
+                  {(document.type === 'Invoice' || document.type === 'Pre-Order' || (document.type === 'Quotation' && document.show_bank_details)) && (tenant.bank_name || tenant.bank_account_number || tenant.bank_account_name) && (
                     <div className={styles.bankBlock}>
                       <div className={styles.bankHeader}>Kindly Bankin To:</div>
                       <div className={styles.bankDetails}>
