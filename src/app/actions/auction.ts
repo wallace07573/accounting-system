@@ -61,6 +61,25 @@ export async function createAuctionRecord(data: {
     }
   }
 
+  // Auto-create customer if not found
+  if (!customerId && data.name) {
+    const { data: newCustomer } = await supabase
+      .from('customers')
+      .insert({
+        tenant_id: tenantId,
+        name: data.name,
+        attention: normalizedPhone || null,
+        contact_number: normalizedPhone || null,
+        balance: 0
+      })
+      .select('id')
+      .single()
+      
+    if (newCustomer) {
+      customerId = newCustomer.id
+    }
+  }
+
   const { error } = await supabase
     .from('auction_records')
     .insert({
@@ -143,6 +162,25 @@ export async function updateAuctionRecord(id: string, data: {
       
     if (customerMatch) {
       customerId = customerMatch.id
+    }
+  }
+
+  // Auto-create customer if not found
+  if (!customerId && data.name) {
+    const { data: newCustomer } = await supabase
+      .from('customers')
+      .insert({
+        tenant_id: tenantId,
+        name: data.name,
+        attention: normalizedPhone || null,
+        contact_number: normalizedPhone || null,
+        balance: 0
+      })
+      .select('id')
+      .single()
+      
+    if (newCustomer) {
+      customerId = newCustomer.id
     }
   }
 
