@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { addCustomerTransaction } from './customer'
 
 export async function createPaymentRecord(data: {
   date: string;
@@ -37,11 +38,22 @@ export async function createPaymentRecord(data: {
 
   // Automatically mark the linked invoice as Verified
   if (data.is_invoice && data.invoice_no) {
+    const { data: doc } = await supabase
+      .from('documents')
+      .select('customer_id, type')
+      .eq('tenant_id', tenantId)
+      .eq('doc_no', data.invoice_no)
+      .single()
+
     await supabase
       .from('documents')
       .update({ status: 'Verified', amount_paid: data.amount })
       .eq('tenant_id', tenantId)
       .eq('doc_no', data.invoice_no)
+
+    if (doc?.type === 'Pre-Order' && doc.customer_id) {
+      await addCustomerTransaction(doc.customer_id, data.amount, `Payment Received for Pre-Order ${data.invoice_no}`)
+    }
   }
 
   // Automatically mark the linked auction as Verified
@@ -209,11 +221,22 @@ export async function updatePaymentRecord(id: string, data: {
 
   // Restore old linked invoice status if reference changed
   if (oldRecord?.is_invoice && oldRecord?.invoice_no && oldRecord.invoice_no !== data.invoice_no) {
+    const { data: oldDoc } = await supabase
+      .from('documents')
+      .select('customer_id, type')
+      .eq('tenant_id', tenantId)
+      .eq('doc_no', oldRecord.invoice_no)
+      .single()
+
     await supabase
       .from('documents')
       .update({ status: 'Draft', amount_paid: 0 })
       .eq('tenant_id', tenantId)
       .eq('doc_no', oldRecord.invoice_no)
+
+    if (oldDoc?.type === 'Pre-Order' && oldDoc.customer_id) {
+      await addCustomerTransaction(oldDoc.customer_id, -oldRecord.amount, `Payment reference removed for Pre-Order ${oldRecord.invoice_no}`)
+    }
   }
 
   // Restore old linked auction status if reference changed
@@ -227,11 +250,31 @@ export async function updatePaymentRecord(id: string, data: {
 
   // Mark new linked invoice as Verified
   if (data.is_invoice && data.invoice_no) {
+    const { data: doc } = await supabase
+      .from('documents')
+      .select('customer_id, type')
+      .eq('tenant_id', tenantId)
+      .eq('doc_no', data.invoice_no)
+      .single()
+
     await supabase
       .from('documents')
       .update({ status: 'Verified', amount_paid: data.amount })
       .eq('tenant_id', tenantId)
       .eq('doc_no', data.invoice_no)
+
+    if (doc?.type === 'Pre-Order' && doc.customer_id) {
+      if (oldRecord?.is_invoice && oldRecord?.invoice_no === data.invoice_no) {
+        // Same invoice, adjust the difference
+        const diff = data.amount - oldRecord.amount
+        if (diff !== 0) {
+          await addCustomerTransaction(doc.customer_id, diff, `Payment amount adjusted for Pre-Order ${data.invoice_no}`)
+        }
+      } else {
+        // New invoice linked
+        await addCustomerTransaction(doc.customer_id, data.amount, `Payment Received for Pre-Order ${data.invoice_no}`)
+      }
+    }
   }
 
   // Mark new linked auction as Verified
@@ -319,11 +362,22 @@ export async function deletePaymentRecord(id: string) {
 
   // Restore linked invoice status back to Draft
   if (record?.is_invoice && record?.invoice_no) {
+    const { data: doc } = await supabase
+      .from('documents')
+      .select('customer_id, type')
+      .eq('tenant_id', tenantId)
+      .eq('doc_no', record.invoice_no)
+      .single()
+
     await supabase
       .from('documents')
       .update({ status: 'Draft', amount_paid: 0 })
       .eq('tenant_id', tenantId)
       .eq('doc_no', record.invoice_no)
+
+    if (doc?.type === 'Pre-Order' && doc.customer_id) {
+      await addCustomerTransaction(doc.customer_id, -record.amount, `Payment deleted for Pre-Order ${record.invoice_no}`)
+    }
   }
 
   // Restore linked auction status back to Draft
