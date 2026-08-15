@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { addCustomerTransaction } from './customer'
+import { formatPhoneNumber } from '@/utils/utils'
 
 const DocumentItemSchema = z.object({
   id: z.string().optional(),
@@ -162,6 +163,7 @@ export async function saveDocument(formData: any) {
           company_name: formData.customer.company_name || null,
           address: formData.customer.address,
           attention: formData.customer.attention,
+          contact_number: formData.customer.attention ? formatPhoneNumber(formData.customer.attention) : null,
           email: formData.customer.email || null
         })
         .eq('id', customerId)
@@ -178,6 +180,7 @@ export async function saveDocument(formData: any) {
           company_name: formData.customer.company_name || null,
           address: formData.customer.address,
           attention: formData.customer.attention,
+          contact_number: formData.customer.attention ? formatPhoneNumber(formData.customer.attention) : null,
           email: formData.customer.email || null
         })
         .select('id')
@@ -348,6 +351,7 @@ export async function updateDocument(id: string, formData: any) {
           company_name: validFormData.customer.company_name || null,
           address: validFormData.customer.address,
           attention: validFormData.customer.attention,
+          contact_number: validFormData.customer.attention ? formatPhoneNumber(validFormData.customer.attention) : null,
           email: validFormData.customer.email || null
         })
         .eq('id', customerId)
@@ -364,6 +368,7 @@ export async function updateDocument(id: string, formData: any) {
           company_name: validFormData.customer.company_name || null,
           address: validFormData.customer.address,
           attention: validFormData.customer.attention,
+          contact_number: validFormData.customer.attention ? formatPhoneNumber(validFormData.customer.attention) : null,
           email: validFormData.customer.email || null
         })
         .select('id')

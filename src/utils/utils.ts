@@ -11,9 +11,9 @@ export function formatPhoneNumber(phone: string | null | undefined): string {
   // Try to clean out common separators to see if it's purely digits, but keep +
   const cleaned = phone.replace(/[^\d+]/g, '');
   
-  // If it already has a plus at the start, return original to preserve user's formatting (like spaces)
-  if (phone.trim().startsWith('+')) {
-    return phone.trim();
+  // If it already has a plus at the start, just return the cleaned string without spaces
+  if (cleaned.startsWith('+')) {
+    return cleaned;
   }
 
   // If it starts with 60 or 65, add +
