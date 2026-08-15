@@ -48,7 +48,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
   }
 
   const docData = {
-    type: document.type as 'Invoice' | 'Quotation' | 'Delivery Order',
+    type: (document.type === 'Pre-Order' ? 'Invoice' : document.type) as 'Invoice' | 'Quotation' | 'Delivery Order',
     doc_no: document.doc_no,
     issue_date: document.issue_date,
     due_date: document.due_date,

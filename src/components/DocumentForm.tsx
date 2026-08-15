@@ -13,7 +13,7 @@ function incrementSequence(sequence: string | null, docType: string): string {
   const mm = (date.getMonth() + 1).toString().padStart(2, '0')
 
   if (!sequence) {
-    if (docType === 'Invoice') return 'INV-1001'
+    if (docType === 'Invoice' || docType === 'Pre-Order') return 'INV-1001'
     if (docType === 'Quotation') return `Q-${yy}-${mm}-1001`
     if (docType === 'Delivery Order') return 'DO-1001'
     return 'DOC-1001'
@@ -52,7 +52,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
   const { toast } = useToast()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [docType, setDocType] = useState(initialData?.type || 'Invoice')
+  const [docType, setDocType] = useState(initialData?.type || 'Pre-Order')
   const [docNo, setDocNo] = useState(initialData?.doc_no || '')
   const defaultDueDate = new Date()
   defaultDueDate.setDate(defaultDueDate.getDate() + 7)
@@ -183,8 +183,8 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
       const groups = await getInvoiceGroups()
       setInvoiceGroups(groups)
 
-      if (!isEditingMode && !initialData?.group_id && docType === 'Invoice') {
-        const prev = await getLastDocumentDetails('Invoice')
+      if (!isEditingMode && !initialData?.group_id && (docType === 'Invoice' || docType === 'Pre-Order')) {
+        const prev = await getLastDocumentDetails(docType)
         if (prev?.group_id) {
           setGroupId(prev.group_id)
         }
@@ -302,14 +302,14 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
       doc_no: docNo,
       issue_date: issueDate,
       due_date: dueDate,
-      title: (docType === 'Quotation' || docType === 'Invoice') ? title : null,
-      is_corporate: (docType === 'Quotation' || docType === 'Invoice') ? isCorporate : false,
-      show_bank_details: (docType === 'Quotation' || docType === 'Invoice') ? showBankDetails : false,
+      title: (docType === 'Quotation' || docType === 'Invoice' || docType === 'Pre-Order') ? title : null,
+      is_corporate: (docType === 'Quotation' || docType === 'Invoice' || docType === 'Pre-Order') ? isCorporate : false,
+      show_bank_details: (docType === 'Quotation' || docType === 'Invoice' || docType === 'Pre-Order') ? showBankDetails : false,
       terms: terms || null,
       customer: finalCustomer,
       amount_paid: amountPaid,
-      status: status === 'Verified' ? 'Verified' : (docType === 'Invoice' && amountPaid > 0 ? 'Payment Received' : status),
-      group_id: docType === 'Invoice' ? (groupId || null) : null,
+      status: status === 'Verified' ? 'Verified' : ((docType === 'Invoice' || docType === 'Pre-Order') && amountPaid > 0 ? 'Payment Received' : status),
+      group_id: (docType === 'Invoice' || docType === 'Pre-Order') ? (groupId || null) : null,
       items: items.map((i: any) => ({
         description: i.description,
         qty: i.qty,
@@ -365,7 +365,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
           setCustomer(prev.customer)
           setCustomerQuery(prev.customer.name)
         }
-        if (prev.group_id && docType === 'Invoice') {
+        if (prev.group_id && (docType === 'Invoice' || docType === 'Pre-Order')) {
           setGroupId(prev.group_id)
         }
         if (prev.items && prev.items.length > 0) {
@@ -478,7 +478,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {initialData?.id && (
             <>
-              {docType === 'Invoice' && status === 'Verified' && (
+              {(docType === 'Invoice' || docType === 'Pre-Order') && status === 'Verified' && (
                 <span
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 16px',
@@ -565,6 +565,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
             value={docType} onChange={e => setDocType(e.target.value)}
             style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', color: '#0f172a', backgroundColor: 'white' }}
           >
+            <option>Pre-Order</option>
             <option>Invoice</option>
             <option>Quotation</option>
             <option>Delivery Order</option>
@@ -599,7 +600,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
           />
         </div>
 
-        {docType === 'Invoice' && (
+        {(docType === 'Invoice' || docType === 'Pre-Order') && (
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Amount Received (RM)</label>
             <input 
@@ -612,7 +613,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
           </div>
         )}
 
-        {docType === 'Invoice' && (
+        {(docType === 'Invoice' || docType === 'Pre-Order') && (
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Invoice Group</label>
             {!isAddingGroup ? (
@@ -673,7 +674,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
           </div>
         )}
 
-        {(docType === 'Quotation' || docType === 'Invoice') && (
+        {(docType === 'Quotation' || docType === 'Invoice' || docType === 'Pre-Order') && (
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Customer Layout</label>
             <select

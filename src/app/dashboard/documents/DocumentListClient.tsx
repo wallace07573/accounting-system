@@ -8,6 +8,7 @@ import styles from './Dashboard.module.css'
 export default function DocumentListClient({ documents }: { documents: any[] }) {
   const getBadgeClass = (type: string) => {
     switch(type) {
+      case 'Pre-Order': return styles.badgeInvoice; // Reuse Invoice badge for Pre-Order
       case 'Invoice': return styles.badgeInvoice;
       case 'Quotation': return styles.badgeQuotation;
       case 'Delivery Order': return styles.badgeDO;
