@@ -2,20 +2,8 @@ import Link from 'next/link'
 import styles from '../Dashboard.module.css'
 import { ArrowLeft } from 'lucide-react'
 import DocumentForm from '@/components/DocumentForm'
-import { createClient } from '@/utils/supabase/server'
-import { cookies } from 'next/headers'
 
 export default async function NewDocumentPage() {
-  const supabase = await createClient()
-  const cookieStore = await cookies()
-  const activeTenantId = cookieStore.get('active_tenant_id')?.value
-
-  let tenant = null
-  if (activeTenantId) {
-    const { data } = await supabase.from('tenants').select('enable_heat_up_po').eq('id', activeTenantId).single()
-    tenant = data
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -28,7 +16,7 @@ export default async function NewDocumentPage() {
       </div>
 
       <div className={styles.card} style={{ padding: '30px' }}>
-        <DocumentForm tenant={tenant} />
+        <DocumentForm />
       </div>
     </div>
   )

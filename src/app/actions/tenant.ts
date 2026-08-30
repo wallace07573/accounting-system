@@ -71,3 +71,23 @@ export async function getCurrentUserRole() {
 
   return data?.role || 'staff'
 }
+
+export async function deleteTenant(tenantId: string) {
+  const supabase = await createClient()
+  
+  const { error } = await supabase.rpc('delete_tenant', { target_tenant_id: tenantId })
+  
+  if (error) {
+    return { error: error.message }
+  }
+
+  // Clear active tenant cookie if it matches the deleted one
+  const cookieStore = await cookies()
+  const activeTenantId = cookieStore.get('active_tenant_id')?.value
+  
+  if (activeTenantId === tenantId) {
+    cookieStore.delete('active_tenant_id')
+  }
+
+  return { success: true }
+}

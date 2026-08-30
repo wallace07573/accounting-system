@@ -210,7 +210,7 @@ export const PremiumDocument: React.FC<PremiumDocumentProps> = ({ tenant, custom
               </div>
             </div>
 
-            {isQuotation && document.title && (
+            {(isQuotation || document.type === 'Invoice') && document.title && (
               <div style={{ marginTop: '24px', marginBottom: '8px' }}>
                 <p style={{ fontWeight: 700, fontSize: '11pt', color: '#0f172a' }}>
                   {document.title}
@@ -219,7 +219,7 @@ export const PremiumDocument: React.FC<PremiumDocumentProps> = ({ tenant, custom
             )}
 
             {/* Table */}
-            <table className={styles.itemsTable} style={{ marginTop: isQuotation && document.title ? '8px' : '32px' }}>
+            <table className={styles.itemsTable} style={{ marginTop: (isQuotation || document.type === 'Invoice') && document.title ? '8px' : '32px' }}>
               <thead>
                 <tr>
                   <th className={styles.colDesc}>ITEM DESCRIPTION</th>

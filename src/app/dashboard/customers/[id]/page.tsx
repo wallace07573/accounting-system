@@ -48,14 +48,6 @@ export default async function CustomerPage({ params }: { params: { id: string } 
     .eq('tenant_id', activeTenantId)
     .order('created_at', { ascending: false })
 
-  // Fetch Auctions
-  const { data: auctions } = await supabase
-    .from('auction_records')
-    .select('*')
-    .eq('customer_id', id)
-    .eq('tenant_id', activeTenantId)
-    .order('date', { ascending: false })
-
   // Fetch other customers for Merge dropdown
   const { data: otherCustomers } = await supabase
     .from('customers')
@@ -179,7 +171,7 @@ export default async function CustomerPage({ params }: { params: { id: string } 
         </div>
       </div>
 
-      <CustomerDetailClient customer={customer} documents={documents || []} transactions={transactions || []} otherCustomers={otherCustomers || []} auctions={auctions || []} />
+      <CustomerDetailClient customer={customer} documents={documents || []} transactions={transactions || []} otherCustomers={otherCustomers || []} />
     </div>
   )
 }

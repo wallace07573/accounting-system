@@ -36,23 +36,11 @@ function incrementSequence(sequence: string | null, docType: string): string {
   return `${prefix}${paddedNextNum}${suffix}`
 }
 
-const HEAT_UP_PRODUCTS = [
-    { id: 1, name: "PKM TCG 30th Celebration Binder Collection", prices: [990, 1260, 1290, 1500] },
-    { id: 2, name: "PKM TCG 30th Celebration Tech Sticker Collection", prices: [1068, 1380, 1440, 1560] },
-    { id: 3, name: "PKM TCG 30th Celebration Tech Poster Collection", prices: [630, 690, 720, 780] },
-    { id: 4, name: "PKM TCG 30th Celebration 2-Pack Blister", prices: [708, 900, 960, 1080] },
-    { id: 5, name: "PKM TCG 30th Celebration Knock Out Collection", prices: [1416, 1800, 1920, 2160] },
-    { id: 6, name: "PKM TCG 30th Celebration EX BOX", prices: [630, 900, 930, 990] },
-    { id: 7, name: "PKM TCG 30th Celebration EX Tin [Assortment]", prices: [810, 990, 1020, 1140] },
-    { id: 8, name: "PKM TCG 30th Celebration ETB", prices: [2400, 3200, 3300, 3500, 3600, 3800] },
-    { id: 9, name: "PKM TCG 30th Celebration Ex Tin", prices: [630, 870, 900, 960], release: "Oct 26" }
-];
-
-export default function DocumentForm({ initialData, tenant }: { initialData?: any, tenant?: any }) {
+export default function DocumentForm({ initialData }: { initialData?: any }) {
   const { toast } = useToast()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [docType, setDocType] = useState(initialData?.type || 'Pre-Order')
+  const [docType, setDocType] = useState(initialData?.type || 'Invoice')
   const [docNo, setDocNo] = useState(initialData?.doc_no || '')
   const defaultDueDate = new Date()
   defaultDueDate.setDate(defaultDueDate.getDate() + 7)
@@ -110,10 +98,6 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
 
   const [isEditingMode] = useState(!!initialData)
 
-  const [hcSelectedProductId, setHcSelectedProductId] = useState<number | ''>('')
-  const [hcSelectedPrice, setHcSelectedPrice] = useState<number | ''>('')
-  const [hcSelectedPercentage, setHcSelectedPercentage] = useState<number>(0)
-
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null)
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -137,38 +121,6 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
 
   const handleDragEnd = () => {
     setDraggedItemIndex(null)
-  }
-
-  const addHeatUpItem = () => {
-    if (hcSelectedProductId === '' || hcSelectedPrice === '') return;
-    const p = HEAT_UP_PRODUCTS.find(x => x.id === hcSelectedProductId);
-    if (!p) return;
-    
-    const finalPrice = hcSelectedPrice * hcSelectedPercentage;
-    const desc = `${p.name} (RM${hcSelectedPrice} @ ${hcSelectedPercentage * 100}%)`;
-
-    const lastItem = items[items.length - 1]
-    const isEmpty = lastItem && !lastItem.description && lastItem.unit_price === 0
-
-    const newItem = {
-      id: Date.now(),
-      description: desc,
-      qty: 1,
-      uom: 'Unit',
-      unit_price: finalPrice,
-      amount: finalPrice,
-      isNew: true
-    }
-
-    if (isEmpty && items.length === 1) {
-      setItems([newItem])
-    } else if (isEmpty) {
-      const newItems = [...items]
-      newItems[newItems.length - 1] = newItem
-      setItems(newItems)
-    } else {
-      setItems([...items, newItem])
-    }
   }
 
   // Fetch initial sequence & products
@@ -662,7 +614,7 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
           </div>
         )}
 
-        {docType === 'Quotation' && (
+        {(docType === 'Quotation' || docType === 'Invoice') && (
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>Project Title (Optional)</label>
             <input 
@@ -835,12 +787,31 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
                     <GripVertical size={18} />
                   </td>
                   <td style={{ padding: '12px', position: 'relative' }}>
-                    <input 
-                      type="text" required placeholder="Item description"
+                    <textarea 
+                      required placeholder="Item description"
                       value={item.description}
-                      onChange={e => handleItemSearch(e.target.value, index)}
+                      onChange={e => {
+                        handleItemSearch(e.target.value, index);
+                        e.target.style.height = 'auto';
+                        e.target.style.height = `${e.target.scrollHeight}px`;
+                      }}
                       onBlur={() => setTimeout(() => setActiveItemIndex(null), 200)}
-                      style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px', outline: 'none', color: '#0f172a', backgroundColor: 'white' }}
+                      rows={1}
+                      style={{ 
+                        width: '100%', 
+                        padding: '8px', 
+                        border: '1px solid #cbd5e1', 
+                        borderRadius: '4px', 
+                        outline: 'none', 
+                        color: '#0f172a', 
+                        backgroundColor: 'white',
+                        resize: 'none',
+                        overflow: 'hidden',
+                        minHeight: '35px',
+                        fontFamily: 'inherit',
+                        fontSize: 'inherit',
+                        lineHeight: '1.5'
+                      }}
                     />
                     {activeItemIndex === index && productSuggestions.length > 0 && (
                       <div style={{ position: 'absolute', top: '100%', left: '12px', right: '12px', backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', zIndex: 20, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
@@ -992,78 +963,6 @@ export default function DocumentForm({ initialData, tenant }: { initialData?: an
             style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', color: '#0f172a', backgroundColor: 'white', resize: 'vertical' }}
           />
         </div>
-
-        {/* Heat Up Collection PO */}
-        {tenant?.enable_heat_up_po && (
-          <div style={{ marginTop: '24px', padding: '20px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            🔥 Heat Up Collection PO
-          </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto', gap: '12px', alignItems: 'end' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>Select Product</label>
-              <select 
-                value={hcSelectedProductId}
-                onChange={(e) => {
-                  setHcSelectedProductId(Number(e.target.value));
-                  setHcSelectedPrice('');
-                }}
-                style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', backgroundColor: 'white' }}
-              >
-                <option value="" disabled>Choose...</option>
-                {HEAT_UP_PRODUCTS.map(p => (
-                  <option key={p.id} value={p.id}>{p.name} {p.release ? `(${p.release})` : ''}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>Target Price</label>
-              <select 
-                value={hcSelectedPrice}
-                onChange={(e) => setHcSelectedPrice(Number(e.target.value))}
-                disabled={hcSelectedProductId === ''}
-                style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', backgroundColor: hcSelectedProductId === '' ? '#f1f5f9' : 'white' }}
-              >
-                <option value="" disabled>Choose price...</option>
-                {hcSelectedProductId !== '' && HEAT_UP_PRODUCTS.find(p => p.id === hcSelectedProductId)?.prices.map(price => (
-                  <option key={price} value={price}>RM {price}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>Percentage</label>
-              <select 
-                value={hcSelectedPercentage}
-                onChange={(e) => setHcSelectedPercentage(Number(e.target.value))}
-                style={{ width: '100px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', backgroundColor: 'white' }}
-              >
-                <option value={0}>0%</option>
-                <option value={0.05}>5%</option>
-                <option value={0.10}>10%</option>
-                <option value={0.15}>15%</option>
-              </select>
-            </div>
-            <button 
-              type="button" 
-              onClick={addHeatUpItem}
-              disabled={hcSelectedProductId === '' || hcSelectedPrice === ''}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: (hcSelectedProductId === '' || hcSelectedPrice === '') ? '#94a3b8' : '#2563eb',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '13px',
-                fontWeight: 500,
-                cursor: (hcSelectedProductId === '' || hcSelectedPrice === '') ? 'not-allowed' : 'pointer',
-                height: '37px'
-              }}
-            >
-              Add
-            </button>
-          </div>
-        </div>
-        )}
       </div>
 
     </form>

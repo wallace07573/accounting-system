@@ -52,7 +52,6 @@ export default async function TeamSettingsPage() {
         <TeamManagement 
           key={activeTenantId}
           tenantId={activeTenantId} 
-          tenantName={tenant?.name || ''}
           members={members || []} 
           invites={invites || []} 
           currentUserId={user.id}

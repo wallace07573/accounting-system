@@ -3,20 +3,10 @@ import DocumentForm from '@/components/DocumentForm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { cookies } from 'next/headers'
 
 export default async function EditDocumentPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const resolvedParams = await params
-  const cookieStore = await cookies()
-  const activeTenantId = cookieStore.get('active_tenant_id')?.value
-
-  let tenant = null
-  if (activeTenantId) {
-    const { data } = await supabase.from('tenants').select('enable_heat_up_po').eq('id', activeTenantId).single()
-    tenant = data
-  }
-  
+  const resolvedParams = await params 
   // Fetch document
   const { data: document, error: docError } = await supabase
     .from('documents')
@@ -49,7 +39,7 @@ export default async function EditDocumentPage({ params }: { params: Promise<{ i
           Edit {document.type} ({document.doc_no})
         </h1>
         
-        <DocumentForm initialData={document} tenant={tenant} />
+        <DocumentForm initialData={document} />
       </div>
     </div>
   )

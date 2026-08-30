@@ -3,18 +3,16 @@
 import { useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
-import { setActiveTenant } from '@/app/actions/tenant'
+import { setActiveTenant, deleteTenant } from '@/app/actions/tenant'
 import { useToast } from '@/components/Toast'
-import { Building2, Upload } from 'lucide-react'
+import { Building2, Upload, AlertTriangle } from 'lucide-react'
 
 export default function CompanySettingsForm({ 
   initialData, 
   userId,
-  isSuperAdmin
 }: { 
   initialData: any, 
   userId: string,
-  isSuperAdmin?: boolean
 }) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -28,8 +26,11 @@ export default function CompanySettingsForm({
     bank_account_name: initialData?.bank_account_name || '',
     logo_url: initialData?.logo_url || '',
     ssm_number: initialData?.ssm_number || '',
-    enable_heat_up_po: initialData?.enable_heat_up_po || false
   })
+  
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
   
   const supabase = createClient()
   const router = useRouter()
@@ -86,8 +87,7 @@ export default function CompanySettingsForm({
             bank_account_number: formData.bank_account_number,
             bank_account_name: formData.bank_account_name,
             logo_url: formData.logo_url,
-            ssm_number: formData.ssm_number,
-            enable_heat_up_po: formData.enable_heat_up_po
+            ssm_number: formData.ssm_number
           })
           .eq('id', initialData.id)
 
@@ -124,6 +124,26 @@ export default function CompanySettingsForm({
       // Force a full hard reload so Next.js clears all layout caches 
       // and re-fetches the user's tenants for the top navigation bar.
       window.location.href = '/dashboard/documents'
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!initialData?.id) return
+    setIsDeleting(true)
+    
+    try {
+      const result = await deleteTenant(initialData.id)
+      if (result?.error) {
+        toast('Error deleting company: ' + result.error, 'error')
+        setIsDeleting(false)
+      } else {
+        toast('Company deleted successfully!', 'success')
+        // Force hard reload so Next.js clears layout caches
+        window.location.href = '/dashboard/documents'
+      }
+    } catch (error: any) {
+      toast('Error deleting company: ' + error.message, 'error')
+      setIsDeleting(false)
     }
   }
 
@@ -190,7 +210,7 @@ export default function CompanySettingsForm({
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
             style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
-            placeholder="e.g. hello@heatup.com"
+            placeholder="e.g. hello@company.com"
           />
         </div>
         
@@ -262,40 +282,86 @@ export default function CompanySettingsForm({
         </div>
       </div>
 
-        {/* Module Settings (Superadmin Only) */}
-        {isSuperAdmin && (
-          <div>
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', marginBottom: '16px', marginTop: '32px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>
-              Module Settings (Superadmin)
-            </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <input
-                type="checkbox"
-                id="enable_heat_up_po"
-                checked={formData.enable_heat_up_po}
-                onChange={(e) => setFormData(prev => ({ ...prev, enable_heat_up_po: e.target.checked }))}
-                style={{ width: '16px', height: '16px' }}
-              />
-              <label htmlFor="enable_heat_up_po" style={{ fontSize: '14px', fontWeight: 500, color: '#334155' }}>
-                Enable Heat Up Collection PO Module
-              </label>
-            </div>
-          </div>
-        )}
-
-        <div style={{ paddingTop: '24px', marginTop: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ paddingTop: '24px', marginTop: '16px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || isDeleting}
           style={{
             backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '8px',
-            padding: '10px 24px', fontSize: '14px', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1
+            padding: '10px 24px', fontSize: '14px', fontWeight: 600, cursor: (loading || isDeleting) ? 'not-allowed' : 'pointer',
+            opacity: (loading || isDeleting) ? 0.7 : 1
           }}
         >
           {loading ? 'Saving...' : initialData?.id ? 'Save Changes' : 'Create Company'}
         </button>
       </div>
+
+      {/* Danger Zone */}
+      {initialData?.id && (
+        <div style={{ marginTop: '24px', borderTop: '1px solid #ef4444', paddingTop: '24px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertTriangle size={20} /> Danger Zone
+          </h2>
+          <p style={{ fontSize: '14px', color: '#475569', marginTop: '8px', marginBottom: '16px' }}>
+            Deleting your company profile is irreversible. It will also permanently delete all associated documents, customers, products, and user data.
+          </p>
+          
+          {!showDeleteConfirm ? (
+            <button
+              type="button"
+              onClick={() => setShowDeleteConfirm(true)}
+              style={{
+                backgroundColor: 'white', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '8px',
+                padding: '10px 24px', fontSize: '14px', fontWeight: 600, cursor: 'pointer'
+              }}
+            >
+              Delete Company
+            </button>
+          ) : (
+            <div style={{ backgroundColor: '#fee2e2', padding: '16px', borderRadius: '8px', border: '1px solid #f87171' }}>
+              <p style={{ fontSize: '14px', fontWeight: 600, color: '#991b1b', marginBottom: '8px' }}>
+                To confirm, type <strong>delete {initialData.name}</strong> in the box below:
+              </p>
+              <input
+                type="text"
+                value={deleteConfirmationText}
+                onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                placeholder={`delete ${initialData.name}`}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #f87171', fontSize: '14px', marginBottom: '12px' }}
+              />
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting || deleteConfirmationText !== `delete ${initialData.name}`}
+                  style={{
+                    backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '6px',
+                    padding: '8px 16px', fontSize: '14px', fontWeight: 600, 
+                    cursor: (isDeleting || deleteConfirmationText !== `delete ${initialData.name}`) ? 'not-allowed' : 'pointer',
+                    opacity: (isDeleting || deleteConfirmationText !== `delete ${initialData.name}`) ? 0.5 : 1
+                  }}
+                >
+                  {isDeleting ? 'Deleting...' : 'Confirm Delete'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteConfirm(false)
+                    setDeleteConfirmationText('')
+                  }}
+                  disabled={isDeleting}
+                  style={{
+                    backgroundColor: 'transparent', color: '#475569', border: 'none',
+                    padding: '8px 16px', fontSize: '14px', fontWeight: 600, cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </form>
   )
 }

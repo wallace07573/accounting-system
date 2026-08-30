@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import CompanySwitcher from '@/components/CompanySwitcher'
 import { cookies } from 'next/headers'
-import { Settings, Users, FileText } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import { LogoutButton } from '@/components/LogoutButton'
 
 export default async function DashboardLayout({
@@ -19,19 +19,16 @@ export default async function DashboardLayout({
     redirect('/')
   }
 
-  // Fetch all tenants the user has access to
-  const { data: tenantUsers, error: tuError } = await supabase
+  const { data: tenantUsers } = await supabase
     .from('tenant_users')
     .select('role, tenant:tenants(id, name, logo_url)')
     .eq('user_id', user.id)
-
 
   const tenants = tenantUsers?.map((tu: any) => tu.tenant) || []
   
   const cookieStore = await cookies()
   const activeTenantId = cookieStore.get('active_tenant_id')?.value
 
-  // Ensure an active tenant is selected if they have tenants
   if (tenants.length > 0 && (!activeTenantId || !tenants.find((t: any) => t.id === activeTenantId))) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
@@ -48,17 +45,8 @@ export default async function DashboardLayout({
     )
   }
 
-  // Determine if we should show the Payments menu
-  const activeTenant = tenants.find((t: any) => t.id === activeTenantId)
-  const activeTenantUser = tenantUsers?.find((tu: any) => tu.tenant?.id === activeTenantId)
-  const isHeatUpCollection = activeTenant?.name?.toLowerCase().includes('heat up')
-  const isOwner = activeTenantUser?.role === 'owner' || activeTenantUser?.role === 'admin' || activeTenantUser?.role === 'super_admin' || user.email === 'wallace@anyismart.com'
-  const isStaff = activeTenantUser?.role === 'staff'
-  const isHeatUpStaff = isHeatUpCollection && isStaff
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Top Navigation Bar */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 md:px-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between md:h-16 gap-3 md:gap-0 py-3 md:py-0">
           <div className="flex items-center justify-between w-full md:w-auto">
@@ -67,11 +55,10 @@ export default async function DashboardLayout({
                 <FileText size={18} color="white" />
               </div>
               <span style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.5px' }}>
-                DocGen SaaS
+                Accounting
               </span>
             </Link>
             
-            {/* Mobile Actions */}
             <div className="flex md:hidden items-center gap-3">
               <CompanySwitcher tenants={tenants} activeTenantId={activeTenantId} />
               <LogoutButton />
@@ -79,32 +66,13 @@ export default async function DashboardLayout({
           </div>
           
           <nav className="flex items-center gap-6 overflow-x-auto whitespace-nowrap pb-1 md:pb-0 w-full md:w-auto md:mx-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {!isHeatUpStaff && (
-              <>
-                <Link href="/dashboard/documents" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Documents</Link>
-                <Link href="/dashboard/products" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Products</Link>
-                <Link href="/dashboard/customers" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Customers</Link>
-              </>
-            )}
-            
-            {isHeatUpCollection && (isOwner || isStaff) && (
-              <>
-                {isOwner && <Link href="/dashboard/payments" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Payments</Link>}
-                <Link href="/dashboard/auctions" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Auctions</Link>
-                <Link href="/dashboard/heatup/wishlists" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Wishlists</Link>
-                <Link href="/dashboard/heatup/preorders" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Preorders</Link>
-              </>
-            )}
-
-            {!isHeatUpStaff && (
-              <>
-                <Link href="/dashboard/settings/team" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Team</Link>
-                <Link href="/dashboard/settings/company" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Settings</Link>
-              </>
-            )}
+            <Link href="/dashboard/documents" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Documents</Link>
+            <Link href="/dashboard/products" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Products</Link>
+            <Link href="/dashboard/customers" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Customers</Link>
+            <Link href="/dashboard/settings/team" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Team</Link>
+            <Link href="/dashboard/settings/company" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>Settings</Link>
           </nav>
 
-          {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
             <CompanySwitcher tenants={tenants} activeTenantId={activeTenantId} />
             
@@ -117,7 +85,6 @@ export default async function DashboardLayout({
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main style={{ flex: 1, padding: '32px 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
         {children}
       </main>

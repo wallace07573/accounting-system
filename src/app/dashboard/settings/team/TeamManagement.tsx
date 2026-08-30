@@ -10,19 +10,17 @@ import { sendTeamInvite } from '@/app/actions/team'
 
 export default function TeamManagement({
   tenantId,
-  tenantName,
   members,
   invites,
   currentUserId
 }: {
   tenantId: string,
-  tenantName: string,
   members: any[],
   invites: any[],
   currentUserId: string
 }) {
   const [email, setEmail] = useState('')
-  const [role, setRole] = useState('staff')
+  const [role, setRole] = useState('member')
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
@@ -82,8 +80,6 @@ export default function TeamManagement({
     }
   }
 
-  const isHeatUpCollection = tenantName?.toLowerCase().includes('heat up')
-
   return (
     <div>
       <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0' }}>
@@ -110,17 +106,8 @@ export default function TeamManagement({
               onChange={(e) => setRole(e.target.value)}
               style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', backgroundColor: 'white' }}
             >
-              {isHeatUpCollection ? (
-                <>
-                  <option value="admin">Heat Up Admin</option>
-                  <option value="staff">Heat Up Staff</option>
-                </>
-              ) : (
-                <>
-                  <option value="admin">Admin</option>
-                  <option value="member">Member</option>
-                </>
-              )}
+              <option value="admin">Admin</option>
+              <option value="member">Member</option>
             </select>
           </div>
           <button

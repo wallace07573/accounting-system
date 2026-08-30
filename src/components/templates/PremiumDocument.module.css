@@ -185,7 +185,10 @@
 }
 
 .colQty { width: 80px; text-align: center; }
-.colDesc { text-align: left; }
+.colDesc { 
+  text-align: left;
+  white-space: pre-wrap;
+}
 .colPrice { width: 120px; text-align: right; }
 .colAmount { width: 120px; text-align: right; }
 

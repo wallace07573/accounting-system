@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { addCustomerTransaction } from './customer'
 import { formatPhoneNumber } from '@/utils/utils'
+import { sanitizeIlikeQuery } from '@/lib/search'
 
 const DocumentItemSchema = z.object({
   id: z.string().optional(),
@@ -93,12 +94,15 @@ export async function searchCustomers(query: string) {
   const tenantId = cookieStore.get('active_tenant_id')?.value
   if (!tenantId) return []
 
+  const safeQuery = sanitizeIlikeQuery(query)
+  if (!safeQuery) return []
+
   const supabase = await createClient()
   const { data } = await supabase
     .from('customers')
     .select('id, name, company_name, address, attention, contact_number')
     .eq('tenant_id', tenantId)
-    .or(`name.ilike.%${query}%,company_name.ilike.%${query}%`)
+    .or(`name.ilike.%${safeQuery}%,company_name.ilike.%${safeQuery}%`)
     .limit(10)
 
   return data || []
@@ -109,12 +113,15 @@ export async function searchProducts(query: string) {
   const tenantId = cookieStore.get('active_tenant_id')?.value
   if (!tenantId) return []
 
+  const safeQuery = sanitizeIlikeQuery(query)
+  if (!safeQuery) return []
+
   const supabase = await createClient()
   const { data } = await supabase
     .from('products')
     .select('id, name, description, uom, default_price')
     .eq('tenant_id', tenantId)
-    .ilike('name', `%${query}%`)
+    .ilike('name', `%${safeQuery}%`)
     .limit(10)
 
   return data || []

@@ -29,18 +29,6 @@ export default async function DashboardPage() {
     if (tenantData) {
       activeTenantName = tenantData.name
     }
-    
-    // Check role for redirection
-    const { data: tenantUser } = await supabase
-      .from('tenant_users')
-      .select('role')
-      .eq('tenant_id', activeTenantId)
-      .eq('user_id', user.id)
-      .single()
-      
-    if (tenantUser?.role === 'staff' && activeTenantName.toLowerCase().includes('heat up')) {
-      redirect('/dashboard/auctions')
-    }
   }
 
   // Fetch documents for the current tenant (RLS handles filtering)

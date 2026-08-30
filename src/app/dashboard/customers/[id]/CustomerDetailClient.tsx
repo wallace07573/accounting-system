@@ -8,7 +8,7 @@ import styles from '../../documents/Dashboard.module.css'
 import { updateCustomer, deleteCustomer, addCustomerTransaction, mergeCustomer } from '@/app/actions/customer'
 import { useToast } from '@/components/Toast'
 
-export default function CustomerDetailClient({ customer, documents, transactions, otherCustomers, auctions = [] }: { customer: any, documents: any[], transactions: any[], otherCustomers: any[], auctions?: any[] }) {
+export default function CustomerDetailClient({ customer, documents, transactions, otherCustomers }: { customer: any, documents: any[], transactions: any[], otherCustomers: any[] }) {
   const [activeTab, setActiveTab] = useState<'history' | 'ledger' | 'edit'>('history')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -176,7 +176,7 @@ export default function CustomerDetailClient({ customer, documents, transactions
       </div>
 
       {activeTab === 'history' && (() => {
-        // Merge and sort documents & auctions
+        // Merge and sort documents
         const allRecords = [
           ...(documents || []).map(doc => ({
             id: doc.id,
@@ -187,15 +187,6 @@ export default function CustomerDetailClient({ customer, documents, transactions
             status: doc.status,
             editLink: `/dashboard/documents/${doc.id}/edit`
           })),
-          ...(auctions || []).map(auc => ({
-            id: auc.id,
-            no: auc.auc_no,
-            type: 'Auction',
-            date: auc.date,
-            amount: auc.amount,
-            status: auc.status,
-            editLink: '/dashboard/auctions'
-          }))
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
         return (
@@ -217,7 +208,7 @@ export default function CustomerDetailClient({ customer, documents, transactions
                     <div className={styles.emptyState}>
                       <FileText size={48} color="#94a3b8" style={{ margin: '0 auto 16px' }} />
                       <div className={styles.emptyTitle}>No records found</div>
-                      <div>This customer does not have any documents or auctions yet.</div>
+                      <div>This customer does not have any documents yet.</div>
                     </div>
                   </td>
                 </tr>

@@ -47,7 +47,7 @@ export default async function CompanySettingsPage({
       </div>
 
       <div style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '32px' }}>
-        <CompanySettingsForm key={tenant?.id || 'new'} initialData={tenant} userId={user.id} isSuperAdmin={user.email === 'wallace@anyismart.com'} />
+        <CompanySettingsForm key={tenant?.id || 'new'} initialData={tenant} userId={user.id} />
       </div>
     </div>
   )

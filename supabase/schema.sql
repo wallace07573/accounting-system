@@ -1,5 +1,8 @@
--- Supabase Schema for Multi-Tenant Document Generator (Workspace Architecture)
--- Run this in your Supabase SQL Editor
+-- BOOTSTRAP ONLY. This file DROPS live tables.
+-- Do not run against production. Applied patches live in:
+--   database/migrations/   (run these)
+--   database/legacy/       (already-applied one-off scripts)
+--   database/add_heatup_tables.sql
 
 -- 0. Clean up existing tables (WARNING: Drops all existing data)
 DROP TABLE IF EXISTS public.document_items CASCADE;
