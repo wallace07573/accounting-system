@@ -25,6 +25,7 @@ export default function DocumentListClient({ documents }: { documents: any[] }) 
     const query = searchQuery.toLowerCase()
     return documents.filter(doc => 
       doc.doc_no?.toLowerCase().includes(query) ||
+      doc.work_order_no?.toLowerCase().includes(query) ||
       doc.customer?.name?.toLowerCase().includes(query) ||
       doc.type?.toLowerCase().includes(query)
     )
@@ -51,7 +52,7 @@ export default function DocumentListClient({ documents }: { documents: any[] }) 
           </div>
           <input 
             type="text" 
-            placeholder="Search by Document No, Customer, or Type..." 
+            placeholder="Search by Document No, Work Order No, Customer, or Type..." 
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value)

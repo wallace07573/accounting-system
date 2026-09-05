@@ -42,6 +42,7 @@ export default function DocumentForm({ initialData }: { initialData?: any }) {
   const [loading, setLoading] = useState(false)
   const [docType, setDocType] = useState(initialData?.type || 'Invoice')
   const [docNo, setDocNo] = useState(initialData?.doc_no || '')
+  const [workOrderNo, setWorkOrderNo] = useState(initialData?.work_order_no || '')
   const defaultDueDate = new Date()
   defaultDueDate.setDate(defaultDueDate.getDate() + 7)
   
@@ -252,6 +253,7 @@ export default function DocumentForm({ initialData }: { initialData?: any }) {
     const payload = {
       type: docType,
       doc_no: docNo,
+      work_order_no: workOrderNo.trim() || null,
       issue_date: issueDate,
       due_date: dueDate,
       title: (docType === 'Quotation' || docType === 'Invoice' || docType === 'Pre-Order') ? title : null,
@@ -548,6 +550,18 @@ export default function DocumentForm({ initialData }: { initialData?: any }) {
           <input 
             type="date"
             value={dueDate} onChange={e => setDueDate(e.target.value)}
+            style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', color: '#0f172a', backgroundColor: 'white' }}
+          />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: '#334155', marginBottom: '8px' }}>
+            Work Order No. <span style={{ fontWeight: 400, color: '#64748b' }}>(Optional)</span>
+          </label>
+          <input 
+            type="text"
+            value={workOrderNo} onChange={e => setWorkOrderNo(e.target.value)}
+            placeholder="e.g. WO-2026-001"
             style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none', color: '#0f172a', backgroundColor: 'white' }}
           />
         </div>

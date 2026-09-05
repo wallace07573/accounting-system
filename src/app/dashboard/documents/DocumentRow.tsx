@@ -31,6 +31,11 @@ export default function DocumentRow({ doc, badgeClass }: { doc: any, badgeClass:
     >
       <td style={{ fontWeight: 600 }}>
         {doc.doc_no}
+        {doc.work_order_no && (
+          <div style={{ fontSize: '11px', color: '#475569', marginTop: '2px', fontWeight: 500 }}>
+            WO: {doc.work_order_no}
+          </div>
+        )}
         {doc.group && (
           <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', fontWeight: 'normal' }}>
             {doc.group.name}

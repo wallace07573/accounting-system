@@ -33,6 +33,7 @@ export interface DocumentItem {
 export interface DocumentData {
   type: 'Invoice' | 'Quotation' | 'Delivery Order' | 'Pre-Order';
   doc_no: string;
+  work_order_no?: string | null;
   issue_date: string;
   due_date?: string;
   title?: string;
@@ -141,6 +142,13 @@ export const PremiumDocument: React.FC<PremiumDocumentProps> = ({ tenant, custom
                     <span className={styles.metaRowColon}>:</span>
                     <span className={styles.metaRowValue}>{document.doc_no}</span>
                   </div>
+                  {document.work_order_no && (
+                    <div className={styles.metaRow}>
+                      <span className={styles.metaRowLabel}>WORK ORDER NO.</span>
+                      <span className={styles.metaRowColon}>:</span>
+                      <span className={styles.metaRowValue}>{document.work_order_no}</span>
+                    </div>
+                  )}
                   <div className={styles.metaRow}>
                     <span className={styles.metaRowLabel}>DATE</span>
                     <span className={styles.metaRowColon}>:</span>

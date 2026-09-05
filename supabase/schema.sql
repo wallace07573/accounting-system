@@ -80,6 +80,7 @@ CREATE TABLE public.documents (
     group_id UUID REFERENCES public.invoice_groups(id) ON DELETE SET NULL,
     type TEXT NOT NULL CHECK (type IN ('Invoice', 'Quotation', 'Delivery Order')),
     doc_no TEXT NOT NULL,
+    work_order_no TEXT,
     issue_date DATE NOT NULL,
     due_date DATE,
     terms TEXT,

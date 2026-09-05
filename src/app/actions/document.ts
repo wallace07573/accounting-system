@@ -23,6 +23,7 @@ const DocumentItemSchema = z.object({
 const DocumentSchema = z.object({
   type: z.string(),
   doc_no: z.string().min(1, 'Document number is required'),
+  work_order_no: z.string().nullable().optional(),
   issue_date: z.string().min(1, 'Issue date is required'),
   due_date: z.string().nullable().optional(),
   title: z.string().nullable().optional(),
@@ -209,6 +210,7 @@ export async function saveDocument(formData: any) {
         customer_id: customerId,
         type: validFormData.type,
         doc_no: validFormData.doc_no,
+        work_order_no: validFormData.work_order_no?.trim() || null,
         issue_date: validFormData.issue_date,
         due_date: validFormData.due_date || null,
         title: validFormData.title || null,
@@ -401,6 +403,7 @@ export async function updateDocument(id: string, formData: any) {
         customer_id: customerId,
         type: validFormData.type,
         doc_no: validFormData.doc_no,
+        work_order_no: validFormData.work_order_no?.trim() || null,
         issue_date: validFormData.issue_date,
         due_date: validFormData.due_date || null,
         title: validFormData.title || null,
